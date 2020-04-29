@@ -3,6 +3,8 @@ import { compare } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 import authConfig from '../config/auth';
 
+import AppError from '../errors/AppError';
+
 import User from '../models/User';
 
 interface Request {
@@ -24,14 +26,14 @@ class AuthUserService {
     });
 
     if (!user) {
-      throw new Error('Incorrect Credentials, email/password');
+      throw new AppError('Incorrect Credentials, email/password', 401);
     }
 
     // string / Hash
     const passwordMatched = await compare(password, user.password);
 
     if (!passwordMatched) {
-      throw new Error('Incorrect Credentials, email/password');
+      throw new AppError('Incorrect Credentials, email/password', 401);
     }
 
     const token = sign({}, authConfig.jwt.secret, {
